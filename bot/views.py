@@ -55,13 +55,13 @@ def callback(request):
                     last_index = len(data['data']) - 1
                     line_bot_api.reply_message(
                         event.reply_token,
-                    TextSendMessage(text=title_list[index_num_in_title] + title_list[index_name_in_title] + " " + 
-                                         data['data'][last_index][index_closing_price_in_data])
+                        TextSendMessage(text=title_list[index_num_in_title] + title_list[index_name_in_title] + " " +
+                                        data['data'][last_index][index_closing_price_in_data])
                     )
                 except KeyError:
                     line_bot_api.reply_message(
                         event.reply_token,
-                    TextSendMessage(text="請輸入上市公司股票代碼")
+                        TextSendMessage(text="請輸入上市公司股票代碼")
                     )
         return HttpResponse()
     else:
@@ -80,6 +80,5 @@ def callback(request):
             return HttpResponse("I'm here")
         except KeyError:
             return HttpResponse("請輸入上市公司股票代碼")
-        
-        #return HttpResponseBadRequest()
 
+        # return HttpResponseBadRequest()
