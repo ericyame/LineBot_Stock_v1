@@ -14,8 +14,6 @@ import datetime
 import os
 
 # Create your views here.
-print(os.environ.get('LINE_CHANNEL_ACCESS_TOKEN'))
-print(os.environ.get('LINE_CHANNEL_SECRET'))
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 index_closing_price_in_data = 6
@@ -65,6 +63,7 @@ def callback(request):
                     )
         return HttpResponse()
     else:
+        pritn("Not POST request, debug only...")
         now = datetime.datetime.now()
         print(now.strftime("%Y%m%d"))
         url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=2330' % (now.strftime("%Y%m%d"))
