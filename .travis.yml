@@ -1,0 +1,4 @@
+language: python
+python:
+    - "3.6.7"
+script: pycodestyle --max-line-length=160 .
