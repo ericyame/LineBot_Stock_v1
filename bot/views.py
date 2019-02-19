@@ -63,7 +63,7 @@ def callback(request):
                     )
         return HttpResponse()
     else:
-        pritn("Not POST request, debug only...")
+        print("Not POST request, debug only...")
         now = datetime.datetime.now()
         print(now.strftime("%Y%m%d"))
         url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=2330' % (now.strftime("%Y%m%d"))
