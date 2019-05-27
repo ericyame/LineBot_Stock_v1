@@ -1,1 +1,1 @@
-# LineBot_Stock_v1 [![Build Status](https://travis-ci.com/ericyame/LineBot_Stock_v1.svg?branch=master)](https://travis-ci.com/ericyame/LineBot_Stock_v1)
+# LineBot_Stock_v1 [![Build Status](https://travis-ci.com/ericyame/LineBot_Stock_v1.svg?branch=master)](https://travis-ci.com/ericyame/LineBot_Stock_v1) [![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/ericyame/LineBot_Stock_v1/branches/Black-Duck-CoPilot/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/ericyame/LineBot_Stock_v1/branches/Black-Duck-CoPilot)
