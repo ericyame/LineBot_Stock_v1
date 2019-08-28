@@ -29,6 +29,7 @@ DEBUG = True
 # Invalid HTTP_HOST header: 'Your hostname'. You may need to add 'Your hostname' to ALLOWED_HOSTS.
 ALLOWED_HOSTS = [
     'line-bot-django-v-1-0.herokuapp.com',
+    'line-bot-django-staging.herokuapp.com',
     '127.0.0.1',
 ]
 
@@ -37,6 +38,8 @@ LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN')
 
 # Add your LINE_CHANNEL_SECRET
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET')
+
+IMGUR_CLIENT_ID = os.environ.get('IMGUR_CLIENT_ID')
 
 # Application definition
 
