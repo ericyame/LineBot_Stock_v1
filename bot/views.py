@@ -35,11 +35,11 @@ def paintingPicToImgur(data):
     print(np.array(y))
 
     # Input x, y list
-    plt.plot(np.array(x), np.array(y)) 
+    plt.plot(np.array(x), np.array(y))
 
-    plt.xlabel("Date") 
-    plt.ylabel("Closing Price") 
-    plt.title("Stock Pricing Trend") 
+    plt.xlabel("Date")
+    plt.ylabel("Closing Price")
+    plt.title("Stock Pricing Trend")
 
     plt.savefig("stock.png", dpi=300, format="png")
 
