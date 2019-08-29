@@ -48,7 +48,7 @@ def paintingPicToImgur(data):
     imageData = f.read()  # read in our image file
     b64Image = base64.standard_b64encode(imageData)
 
-    client_id = '5f3f118e97e2969'  # settings.IMGUR_CLIENT_ID
+    client_id = settings.IMGUR_CLIENT_ID
     headers = {'Authorization': 'Client-ID ' + str(client_id)}
     data = {'image': b64Image, 'title': 'stock'}  # create a dictionary.
     ret = requests.post(url="https://api.imgur.com/3/upload.json", data=data, headers=headers)
