@@ -29,7 +29,7 @@ def paintingPicToImgur(data):
     x = []
     y = []
     for i in range(len(data['data'])):
-        x.append(data['data'][i][0][4:])
+        x.append(data['data'][i][0][7:])  # Only get date
         y.append(float(data['data'][i][index_closing_price_in_data]))
     print(np.array(x))
     print(np.array(y))
@@ -39,7 +39,7 @@ def paintingPicToImgur(data):
 
     plt.xlabel("Date")
     plt.ylabel("Closing Price")
-    plt.title("Stock Pricing Trend")
+    plt.title("Stock Pricing Trend - " + data['data'][0][0][0:6])  # Add year/month to title
 
     plt.savefig("stock.png", dpi=300, format="png")
 
@@ -53,13 +53,11 @@ def paintingPicToImgur(data):
     data = {'image': b64Image, 'title': 'stock'}  # create a dictionary.
     ret = requests.post(url="https://api.imgur.com/3/upload.json", data=data, headers=headers)
     jsonOutput = ret.json()
-    print(jsonOutput)
     return jsonOutput['data']['link']
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
 def callback(request):
-    print("Callback")
     if request.method == 'POST':
         print("POST request")
         signature = request.META['HTTP_X_LINE_SIGNATURE']
