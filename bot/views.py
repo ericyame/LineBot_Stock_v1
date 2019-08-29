@@ -23,6 +23,7 @@ index_closing_price_in_data = 6
 index_num_in_title = 1
 index_name_in_title = 2
 
+
 def paintingPicToImgur(data):
     # Painting with matplotlib
     x = []
