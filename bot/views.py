@@ -40,16 +40,16 @@ def paintingPicToImgur(data):
     plt.ylabel("Closing Price") 
     plt.title("Stock Pricing Trend") 
 
-    plt.savefig("stock.png",dpi=300,format="png")
+    plt.savefig("stock.png", dpi=300, format="png")
 
     # Upload picture to Imgur
-    f = open("stock.png", "rb") # open our image file as read only in binary mode
-    imageData = f.read() # read in our image file
+    f = open("stock.png", "rb")  # open our image file as read only in binary mode
+    imageData = f.read()  # read in our image file
     b64Image = base64.standard_b64encode(imageData)
 
-    client_id = '5f3f118e97e2969' #settings.IMGUR_CLIENT_ID
+    client_id = '5f3f118e97e2969'  # settings.IMGUR_CLIENT_ID
     headers = {'Authorization': 'Client-ID ' + str(client_id)}
-    data = {'image': b64Image, 'title': 'stock'} # create a dictionary.
+    data = {'image': b64Image, 'title': 'stock'}  # create a dictionary.
     ret = requests.post(url="https://api.imgur.com/3/upload.json", data=data, headers=headers)
     jsonOutput = ret.json()
     print(jsonOutput)
@@ -88,9 +88,9 @@ def callback(request):
                     link = paintingPicToImgur(data)
                     line_bot_api.reply_message(
                         event.reply_token, [
-                        TextSendMessage(text=title_list[index_num_in_title] + title_list[index_name_in_title] + " " +
-                                        data['data'][last_index][index_closing_price_in_data]),
-                        ImageSendMessage(original_content_url=link, preview_image_url=link)
+                            TextSendMessage(text=title_list[index_num_in_title] + title_list[index_name_in_title] + " " +
+                                            data['data'][last_index][index_closing_price_in_data]),
+                            ImageSendMessage(original_content_url=link, preview_image_url=link)
                         ]
                     )
 
