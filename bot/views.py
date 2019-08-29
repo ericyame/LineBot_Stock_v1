@@ -85,18 +85,23 @@ def callback(request):
 
                     # Reply stock price
                     last_index = len(data['data']) - 1
+                    link = paintingPicToImgur(data)
                     line_bot_api.reply_message(
-                        event.reply_token,
+                        event.reply_token, [
                         TextSendMessage(text=title_list[index_num_in_title] + title_list[index_name_in_title] + " " +
-                                        data['data'][last_index][index_closing_price_in_data])
+                                        data['data'][last_index][index_closing_price_in_data]),
+                        ImageSendMessage(original_content_url=link, preview_image_url=link)
+                        ]
                     )
 
                     # Reply stock trend pic
+                    '''
                     link = paintingPicToImgur(data)
                     line_bot_api.reply_message(
                         event.reply_token,
                         ImageSendMessage(original_content_url=link, preview_image_url=link)
                     )
+                    '''
                 except KeyError:
                     line_bot_api.reply_message(
                         event.reply_token,
