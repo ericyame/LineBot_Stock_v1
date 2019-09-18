@@ -24,6 +24,13 @@ index_num_in_title = 1
 index_name_in_title = 2
 
 
+def drawPoint(arrX, arrY, y, size, color):
+    plt.scatter([np.array(arrX)[y]], [np.array(arrY)[y]], s=size, color=color)
+    plt.annotate(np.array(arrY)[y],
+                 xy=(np.array(arrX)[y], np.array(arrY)[y]),
+                 fontsize=10)
+
+
 def paintingPicToImgur(data):
     # Painting with matplotlib
     x = []
@@ -34,8 +41,19 @@ def paintingPicToImgur(data):
     print(np.array(x))
     print(np.array(y))
 
-    # Input x, y list
+    plt.style.use('ggplot')
+
+    # Input x, y numpy array
     plt.plot(np.array(x), np.array(y))
+
+    # Mark max/min values
+    maxIndexOfY = np.where(np.array(y) == max(np.array(y)))[0][0]
+    minIndexOfY = np.where(np.array(y) == min(np.array(y)))[0][0]
+    drawPoint(np.array(x), np.array(y), maxIndexOfY, 10, "red")
+    drawPoint(np.array(x), np.array(y), minIndexOfY, 10, "red")
+
+    # Mark closing price value
+    drawPoint(np.array(x), np.array(y), -1, 10, "red")
 
     plt.xlabel("Date")
     plt.ylabel("Closing Price")
