@@ -1,5 +1,5 @@
 Django==2.1.11
 line-bot-sdk==1.8.0
-gunicorn==19.5.0
+gunicorn==20.0.3
 pycodestyle>=2.4.0
 matplotlib>=3.1.1
