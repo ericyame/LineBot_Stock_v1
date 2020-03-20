@@ -78,6 +78,7 @@ def paintingPicToImgur(data):
 def callback(request):
     if request.method == 'POST':
         print("POST request")
+        print(request)
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
 
