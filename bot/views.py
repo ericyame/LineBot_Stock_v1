@@ -79,8 +79,8 @@ def callback(request):
     if request.method == 'POST':
         print("POST request")
         print(type(request))
-        json_line = request.get_json()
-        print(json_line)
+        raw_uri = request.get_raw_uri()
+        print(raw_uri)
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
 
