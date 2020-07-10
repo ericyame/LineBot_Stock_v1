@@ -93,6 +93,7 @@ def getStockInfo(stockId):
 
     return title_list, data['data'][last_index][index_closing_price_in_data], link
 
+
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
 def callback(request):
@@ -135,6 +136,7 @@ def callback(request):
             return HttpResponse(str(datetime.datetime.now()))
         except KeyError:
             return HttpResponse("請輸入上市公司股票代碼")
+
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
