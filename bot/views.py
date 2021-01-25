@@ -8,9 +8,9 @@ from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import MessageEvent, TextSendMessage, ImageSendMessage
 
+from datetime import datetime
 import requests
 import json
-import datetime
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -75,7 +75,7 @@ def paintingPicToImgur(data):
 
 
 def getStockInfo(stockId):
-    now = datetime.datetime.now()
+    now = datetime.now()
     url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=%s' % (now.strftime("%Y%m%d"), stockId)
     r = requests.get(url)
     data = r.json()
@@ -133,7 +133,7 @@ def callback(request):
             print(title[index_num_in_title] + ":" + title[index_name_in_title])
             print(price)
             print(link)
-            return HttpResponse(str(datetime.datetime.now()))
+            return HttpResponse(str(datetime.now()))
         except KeyError:
             return HttpResponse("請輸入上市公司股票代碼")
 
@@ -142,6 +142,11 @@ def callback(request):
 @csrf_exempt
 def pushNotification(request):
     print("Full path: ", request.get_full_path())
+
+    # Skip notification on weekend. '5' is Saturday and '6' is Sunday.
+    if datetime.now().weekday() == 5 or datetime.now().weekday() == 6:
+        return HttpResponse()
+
     if request.method == 'PUT' and request.get_full_path() == '/bot/pushNotification/':
         title, price, link = getStockInfo('2317')
         try:
