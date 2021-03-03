@@ -111,6 +111,7 @@ def callback(request):
 
         for event in events:
             if isinstance(event, MessageEvent):
+                print(event.source.userId)
                 title, price, link = getStockInfo(event.message.text)
                 try:
                     line_bot_api.reply_message(
