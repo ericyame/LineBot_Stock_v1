@@ -1,4 +1,4 @@
-Django==3.1.13
+Django==3.2.5
 line-bot-sdk==1.19.0
 gunicorn==20.1.0
 pycodestyle>=2.4.0
