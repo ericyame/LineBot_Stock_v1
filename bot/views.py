@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import base64
 
+from bot.models import Stock
+
 # Create your views here.
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
@@ -93,6 +95,43 @@ def getStockInfo(stockId):
 
     return title_list, data['data'][last_index][index_closing_price_in_data], link
 
+def handleMessage(text):
+    cmds = text.split()
+    res = ""
+    link = None
+    if cmds[0] == 'r':
+        # register
+        s, created = Stock.objects.get_or_create(stock_id=int(cmds[1]))
+        if not created:
+            res = "您已註冊過此股票代號:" + cmds[1]
+        else:
+            res = "已為您註冊股票:" + cmds[1]
+    elif cmds[0] == 'd':
+        # delete
+        if Stock.objects.filter(stock_id=int(cmds[1])).exists():
+            Stock.objects.filter(stock_id=int(cmds[1])).delete()
+            res = "已刪除此股票紀錄:" + cmds[1]
+        else:
+            res = "您尚未註冊此股票代號:" + cmds[1]
+    elif cmds[0] == 'q':
+        # query
+        res += "你所註冊過的股票代號: \n"
+        for s in Stock.objects.all():
+            res += str(s.stock_id) + "\n"
+    elif cmds[0] == 'h':
+        # help
+        res = """
+請輸入以下指令:
+r <股票代號>: 註冊股票, 會收到每日收盤價推播
+d <股票代號>: 刪除此股票的每日收盤價推播
+q: 查詢註冊的股票
+h: 指令說明
+<股票代號>: 查詢此股票收盤價
+        """
+    else:
+        title, price, link = getStockInfo(cmds[0])
+        res = title[index_num_in_title] + title[index_name_in_title] + " " + price
+    return res, link
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
@@ -111,16 +150,18 @@ def callback(request):
 
         for event in events:
             if isinstance(event, MessageEvent):
-                title, price, link = getStockInfo(event.message.text)
+                res, link = handleMessage(event.message.text)
                 try:
-                    line_bot_api.reply_message(
-                        event.reply_token, [
-                            TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
-                                            price),
-                            ImageSendMessage(original_content_url=link, preview_image_url=link)
-                        ]
-                    )
-                except KeyError:
+                    if link:
+                        line_bot_api.reply_message(
+                            event.reply_token, [
+                                TextSendMessage(text=res),
+                                ImageSendMessage(original_content_url=link, preview_image_url=link)])
+                    else:
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                                TextSendMessage(text=res))
+                except ValueError:
                     line_bot_api.reply_message(
                         event.reply_token,
                         TextSendMessage(text="請輸入上市公司股票代碼")
@@ -128,15 +169,9 @@ def callback(request):
         return HttpResponse()
     else:
         print("Not POST request, debug only...")
-        title, price, link = getStockInfo('2317')
-        try:
-            print(title[index_num_in_title] + ":" + title[index_name_in_title])
-            print(price)
-            print(link)
-            return HttpResponse(str(datetime.now()))
-        except KeyError:
-            return HttpResponse("請輸入上市公司股票代碼")
-
+        res, link = handleMessage('d 9876')
+        print(res)
+        return HttpResponse(res)
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
@@ -148,15 +183,16 @@ def pushNotification(request):
         return HttpResponse()
 
     if request.method == 'PUT' and request.get_full_path() == '/bot/pushNotification/':
-        title, price, link = getStockInfo('2317')
-        try:
-            line_bot_api.push_message(settings.LINE_USER_ID, [
-                            TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
-                                            price),
-                            ImageSendMessage(original_content_url=link, preview_image_url=link)
-            ])
-            return HttpResponse()
-        except LineBotApiError as e:
-            return HttpResponse("Line推播失敗")
+        for s in Stock.objects.all():
+            title, price, link = getStockInfo(str(s.stock_id))
+            try:
+                line_bot_api.push_message(settings.LINE_USER_ID, [
+                                TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
+                                                price),
+                                ImageSendMessage(original_content_url=link, preview_image_url=link)
+                ])
+            except LineBotApiError as e:
+                return HttpResponse("Line推播失敗")
     else:
         return HttpResponse("推播功能異常")
+    return HttpResponse()
