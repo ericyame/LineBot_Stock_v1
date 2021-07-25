@@ -95,6 +95,7 @@ def getStockInfo(stockId):
 
     return title_list, data['data'][last_index][index_closing_price_in_data], link
 
+
 def handleMessage(text):
     cmds = text.split()
     res = ""
@@ -133,6 +134,7 @@ h: 指令說明
         res = title[index_num_in_title] + title[index_name_in_title] + " " + price
     return res, link
 
+
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
 def callback(request):
@@ -159,8 +161,7 @@ def callback(request):
                                 ImageSendMessage(original_content_url=link, preview_image_url=link)])
                     else:
                         line_bot_api.reply_message(
-                            event.reply_token,
-                                TextSendMessage(text=res))
+                            event.reply_token, TextSendMessage(text=res))
                 except ValueError:
                     line_bot_api.reply_message(
                         event.reply_token,
@@ -172,6 +173,7 @@ def callback(request):
         res, link = handleMessage('d 9876')
         print(res)
         return HttpResponse(res)
+
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
 @csrf_exempt
