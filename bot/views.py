@@ -81,17 +81,17 @@ def getStockInfo(stockId):
     url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=%s' % (now.strftime("%Y%m%d"), stockId)
     r = requests.get(url)
     data = r.json()
-    try:
-        # Get stock name and number
-        # Title example: "107年12月 2330 台積電           各日成交資訊"
-        all_title = data['title']
-        title_list = all_title.split(' ')
 
-        # Reply stock price and trend picture
-        last_index = len(data['data']) - 1
-        link = paintingPicToImgur(data)
-    except KeyError:
-        return HttpResponse("請輸入上市公司股票代碼")
+    if data['stat'] != 'OK':
+        return None, None, None
+    # Get stock name and number
+    # Title example: "107年12月 2330 台積電           各日成交資訊"
+    all_title = data['title']
+    title_list = all_title.split(' ')
+
+    # Reply stock price and trend picture
+    last_index = len(data['data']) - 1
+    link = paintingPicToImgur(data, stockId)
 
     return title_list, data['data'][last_index][index_closing_price_in_data], link
 
@@ -131,7 +131,8 @@ h: 指令說明
         """
     else:
         title, price, link = getStockInfo(cmds[0])
-        res = title[index_num_in_title] + title[index_name_in_title] + " " + price
+        if title:
+            res = title[index_num_in_title] + title[index_name_in_title] + " " + price
     return res, link
 
 
@@ -153,20 +154,17 @@ def callback(request):
         for event in events:
             if isinstance(event, MessageEvent):
                 res, link = handleMessage(event.message.text)
-                try:
-                    if link:
-                        line_bot_api.reply_message(
-                            event.reply_token, [
-                                TextSendMessage(text=res),
-                                ImageSendMessage(original_content_url=link, preview_image_url=link)])
-                    else:
-                        line_bot_api.reply_message(
-                            event.reply_token, TextSendMessage(text=res))
-                except ValueError:
+                if link:
                     line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text="請輸入上市公司股票代碼")
-                    )
+                        event.reply_token, [
+                            TextSendMessage(text=res),
+                            ImageSendMessage(original_content_url=link, preview_image_url=link)])
+                elif res != "":
+                    line_bot_api.reply_message(
+                        event.reply_token, TextSendMessage(text=res))
+                else:
+                    line_bot_api.reply_message(
+                        event.reply_token, TextSendMessage(text="請輸入上市公司股票代碼"))
         return HttpResponse()
     else:
         print("Not POST request, debug only...")
@@ -187,14 +185,15 @@ def pushNotification(request):
     if request.method == 'PUT' and request.get_full_path() == '/bot/pushNotification/':
         for s in Stock.objects.all():
             title, price, link = getStockInfo(str(s.stock_id))
-            try:
+            if title:
                 line_bot_api.push_message(settings.LINE_USER_ID, [
                                 TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
                                                 price),
                                 ImageSendMessage(original_content_url=link, preview_image_url=link)
                 ])
-            except LineBotApiError as e:
-                return HttpResponse("Line推播失敗")
+            else:
+                line_bot_api.push_message(
+                    settings.LINE_USER_ID, TextSendMessage(text="%s 不是上市公司股票代碼" % str(s.stock_id)))
     else:
         return HttpResponse("推播功能異常")
     return HttpResponse()
