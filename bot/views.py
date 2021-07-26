@@ -13,12 +13,13 @@ import requests
 import json
 import os
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import base64
 
 from bot.models import Stock
+
+matplotlib.use('Agg')
 
 # Create your views here.
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
