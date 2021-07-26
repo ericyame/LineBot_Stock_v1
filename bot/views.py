@@ -12,6 +12,8 @@ from datetime import datetime
 import requests
 import json
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import base64
@@ -33,7 +35,7 @@ def drawPoint(arrX, arrY, y, size, color):
                  fontsize=10)
 
 
-def paintingPicToImgur(data):
+def paintingPicToImgur(data, stockId):
     # Painting with matplotlib
     x = []
     y = []
@@ -61,10 +63,12 @@ def paintingPicToImgur(data):
     plt.ylabel("Closing Price")
     plt.title("Stock Pricing Trend - " + data['data'][0][0][0:6])  # Add year/month to title
 
-    plt.savefig("stock.png", dpi=300, format="png")
+    filename = "stock_%s.png" % (stockId)
+    plt.savefig(filename, dpi=300, format="png")
+    plt.clf()
 
     # Upload picture to Imgur
-    f = open("stock.png", "rb")  # open our image file as read only in binary mode
+    f = open(filename, "rb")  # open our image file as read only in binary mode
     imageData = f.read()  # read in our image file
     b64Image = base64.standard_b64encode(imageData)
 
