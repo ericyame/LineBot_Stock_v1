@@ -12,9 +12,14 @@ from datetime import datetime
 import requests
 import json
 import os
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import base64
+
+from bot.models import Stock
+
+matplotlib.use('Agg')
 
 # Create your views here.
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
@@ -31,7 +36,7 @@ def drawPoint(arrX, arrY, y, size, color):
                  fontsize=10)
 
 
-def paintingPicToImgur(data):
+def paintingPicToImgur(data, stockId):
     # Painting with matplotlib
     x = []
     y = []
@@ -59,10 +64,12 @@ def paintingPicToImgur(data):
     plt.ylabel("Closing Price")
     plt.title("Stock Pricing Trend - " + data['data'][0][0][0:6])  # Add year/month to title
 
-    plt.savefig("stock.png", dpi=300, format="png")
+    filename = "stock_%s.png" % (stockId)
+    plt.savefig(filename, dpi=300, format="png")
+    plt.clf()
 
     # Upload picture to Imgur
-    f = open("stock.png", "rb")  # open our image file as read only in binary mode
+    f = open(filename, "rb")  # open our image file as read only in binary mode
     imageData = f.read()  # read in our image file
     b64Image = base64.standard_b64encode(imageData)
 
@@ -79,19 +86,59 @@ def getStockInfo(stockId):
     url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=%s' % (now.strftime("%Y%m%d"), stockId)
     r = requests.get(url)
     data = r.json()
-    try:
-        # Get stock name and number
-        # Title example: "107年12月 2330 台積電           各日成交資訊"
-        all_title = data['title']
-        title_list = all_title.split(' ')
 
-        # Reply stock price and trend picture
-        last_index = len(data['data']) - 1
-        link = paintingPicToImgur(data)
-    except KeyError:
-        return HttpResponse("請輸入上市公司股票代碼")
+    if data['stat'] != 'OK':
+        return None, None, None
+    # Get stock name and number
+    # Title example: "107年12月 2330 台積電           各日成交資訊"
+    all_title = data['title']
+    title_list = all_title.split(' ')
+
+    # Reply stock price and trend picture
+    last_index = len(data['data']) - 1
+    link = paintingPicToImgur(data, stockId)
 
     return title_list, data['data'][last_index][index_closing_price_in_data], link
+
+
+def handleMessage(text):
+    cmds = text.split()
+    res = ""
+    link = None
+    if cmds[0] == 'r':
+        # register
+        s, created = Stock.objects.get_or_create(stock_id=int(cmds[1]))
+        if not created:
+            res = "您已註冊過此股票代號:" + cmds[1]
+        else:
+            res = "已為您註冊股票:" + cmds[1]
+    elif cmds[0] == 'd':
+        # delete
+        if Stock.objects.filter(stock_id=int(cmds[1])).exists():
+            Stock.objects.filter(stock_id=int(cmds[1])).delete()
+            res = "已刪除此股票紀錄:" + cmds[1]
+        else:
+            res = "您尚未註冊此股票代號:" + cmds[1]
+    elif cmds[0] == 'q':
+        # query
+        res += "你所註冊過的股票代號: \n"
+        for s in Stock.objects.all():
+            res += str(s.stock_id) + "\n"
+    elif cmds[0] == 'h':
+        # help
+        res = """
+請輸入以下指令:
+r <股票代號>: 註冊股票, 會收到每日收盤價推播
+d <股票代號>: 刪除此股票的每日收盤價推播
+q: 查詢註冊的股票
+h: 指令說明
+<股票代號>: 查詢此股票收盤價
+        """
+    else:
+        title, price, link = getStockInfo(cmds[0])
+        if title:
+            res = title[index_num_in_title] + title[index_name_in_title] + " " + price
+    return res, link
 
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
@@ -111,31 +158,24 @@ def callback(request):
 
         for event in events:
             if isinstance(event, MessageEvent):
-                title, price, link = getStockInfo(event.message.text)
-                try:
+                res, link = handleMessage(event.message.text)
+                if link:
                     line_bot_api.reply_message(
                         event.reply_token, [
-                            TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
-                                            price),
-                            ImageSendMessage(original_content_url=link, preview_image_url=link)
-                        ]
-                    )
-                except KeyError:
+                            TextSendMessage(text=res),
+                            ImageSendMessage(original_content_url=link, preview_image_url=link)])
+                elif res != "":
                     line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text="請輸入上市公司股票代碼")
-                    )
+                        event.reply_token, TextSendMessage(text=res))
+                else:
+                    line_bot_api.reply_message(
+                        event.reply_token, TextSendMessage(text="請輸入上市公司股票代碼"))
         return HttpResponse()
     else:
         print("Not POST request, debug only...")
-        title, price, link = getStockInfo('2317')
-        try:
-            print(title[index_num_in_title] + ":" + title[index_name_in_title])
-            print(price)
-            print(link)
-            return HttpResponse(str(datetime.now()))
-        except KeyError:
-            return HttpResponse("請輸入上市公司股票代碼")
+        res, link = handleMessage('d 9876')
+        print(res)
+        return HttpResponse(res)
 
 
 # You will see 'Forbidden (CSRF cookie not set.)' if missing below
@@ -148,15 +188,17 @@ def pushNotification(request):
         return HttpResponse()
 
     if request.method == 'PUT' and request.get_full_path() == '/bot/pushNotification/':
-        title, price, link = getStockInfo('2317')
-        try:
-            line_bot_api.push_message(settings.LINE_USER_ID, [
-                            TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
-                                            price),
-                            ImageSendMessage(original_content_url=link, preview_image_url=link)
-            ])
-            return HttpResponse()
-        except LineBotApiError as e:
-            return HttpResponse("Line推播失敗")
+        for s in Stock.objects.all():
+            title, price, link = getStockInfo(str(s.stock_id))
+            if title:
+                line_bot_api.push_message(settings.LINE_USER_ID, [
+                                TextSendMessage(text=title[index_num_in_title] + title[index_name_in_title] + " " +
+                                                price),
+                                ImageSendMessage(original_content_url=link, preview_image_url=link)
+                ])
+            else:
+                line_bot_api.push_message(
+                    settings.LINE_USER_ID, TextSendMessage(text="%s 不是上市公司股票代碼" % str(s.stock_id)))
     else:
         return HttpResponse("推播功能異常")
+    return HttpResponse()
