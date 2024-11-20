@@ -42,7 +42,7 @@ def paintingPicToImgur(data, stockId):
     y = []
     for i in range(len(data['data'])):
         x.append(data['data'][i][0][7:])  # Only get date
-        y.append(float(data['data'][i][index_closing_price_in_data]))
+        y.append(float(data['data'][i][index_closing_price_in_data].replace(',', '')))
     print(np.array(x))
     print(np.array(y))
 

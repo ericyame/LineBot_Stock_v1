@@ -31,6 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'line-bot-django-v-1-0.herokuapp.com',
     'line-bot-django-staging.herokuapp.com',
+    'line-bot-ericlei.fly.dev',
     '127.0.0.1',
 ]
 
@@ -93,7 +94,7 @@ WSGI_APPLICATION = 'line_bot.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=False)
 }
 
 # Password validation
