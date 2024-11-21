@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for line-bot-ericlei on 2024-11-20T23:26:19+08:00
+# fly.toml app configuration file generated for line-bot-ericlei-staging on 2024-11-21T16:04:59+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'line-bot-ericlei'
+app = 'line-bot-ericlei-staging'
 primary_region = 'hkg'
 console_command = '/code/manage.py shell'
 

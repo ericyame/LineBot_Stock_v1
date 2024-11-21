@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'NA')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,20 +32,21 @@ ALLOWED_HOSTS = [
     'line-bot-django-v-1-0.herokuapp.com',
     'line-bot-django-staging.herokuapp.com',
     'line-bot-ericlei.fly.dev',
+    'line-bot-ericlei-staging.fly.dev',
     '127.0.0.1',
 ]
 
 # Add your LINE_CHANNEL_ACCESS_TOKEN
-LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN')
+LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', 'NA')
 
 # Add your LINE_CHANNEL_SECRET
-LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET')
+LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', 'NA')
 
 # Add your LINE_USER_ID
-LINE_USER_ID = os.environ.get('LINE_USER_ID')
+LINE_USER_ID = os.environ.get('LINE_USER_ID', 'NA')
 
 # Add IMGUR_CLIENT_ID
-IMGUR_CLIENT_ID = os.environ.get('IMGUR_CLIENT_ID')
+IMGUR_CLIENT_ID = os.environ.get('IMGUR_CLIENT_ID', 'NA')
 
 # Application definition
 
