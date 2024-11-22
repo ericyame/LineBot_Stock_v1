@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     url('^callback/', views.callback),
-    url('^push_notification/', views.push_notification),
+    url('^pushNotification/', views.pushNotification),
 ]

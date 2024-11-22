@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'NA')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,16 +37,16 @@ ALLOWED_HOSTS = [
 ]
 
 # Add your LINE_CHANNEL_ACCESS_TOKEN
-LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', 'NA')
+LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN')
 
 # Add your LINE_CHANNEL_SECRET
-LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', 'NA')
+LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET')
 
 # Add your LINE_USER_ID
-LINE_USER_ID = os.environ.get('LINE_USER_ID', 'NA')
+LINE_USER_ID = os.environ.get('LINE_USER_ID')
 
 # Add IMGUR_CLIENT_ID
-IMGUR_CLIENT_ID = os.environ.get('IMGUR_CLIENT_ID', 'NA')
+IMGUR_CLIENT_ID = os.environ.get('IMGUR_CLIENT_ID')
 
 # Application definition
 
