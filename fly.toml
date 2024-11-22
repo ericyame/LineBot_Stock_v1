@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'line-bot-ericlei'
+app = 'line-bot-ericlei-staging'
 primary_region = 'hkg'
 console_command = '/code/manage.py shell'
 
