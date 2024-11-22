@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     'line-bot-django-v-1-0.herokuapp.com',
     'line-bot-django-staging.herokuapp.com',
     'line-bot-ericlei.fly.dev',
+    'line-bot-ericlei-staging.fly.dev',
     '127.0.0.1',
 ]
 
