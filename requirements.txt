@@ -1,7 +1,10 @@
-Django==3.2.7
+Django==4.2.16
 line-bot-sdk==1.20.0
-gunicorn==20.1.0
+gunicorn==21.2.0
 pycodestyle>=2.4.0
 matplotlib>=3.1.1
 psycopg2-binary
 dj-database-url
+setuptools>=70.0.0
+urllib3>=2.2.2
+requests>=2.32.0
