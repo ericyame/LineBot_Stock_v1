@@ -21,7 +21,9 @@ RUN set -ex && \
     pip install -r /tmp/requirements.txt && \
     rm -rf /root/.cache/
 COPY . /code
+COPY start.sh /code/start.sh
+RUN chmod +x /code/start.sh
 
 EXPOSE 8000
 
-CMD ["gunicorn","--bind",":8000","--workers","2","line_bot.wsgi"]
+CMD ["/code/start.sh"]

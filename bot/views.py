@@ -10,14 +10,17 @@ from linebot.models import MessageEvent, TextSendMessage, ImageSendMessage
 
 from datetime import datetime
 import requests
-import json
-import os
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import base64
+import logging
 
 from bot.models import Stock
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 matplotlib.use('Agg')
 
@@ -101,32 +104,32 @@ def getStockInfo(stockId):
     return title_list, data['data'][last_index][index_closing_price_in_data], link
 
 
-def handleMessage(text):
+def handleMessage(user_id, user_name, text):
     cmds = text.split()
-    res = ""
+    res = f"{user_name} 您好!\n"
     link = None
     if cmds[0] == 'r':
         # register
-        s, created = Stock.objects.get_or_create(stock_id=int(cmds[1]))
+        s, created = Stock.objects.get_or_create(user_id=user_id, stock_id=int(cmds[1]))
         if not created:
-            res = "您已註冊過此股票代號:" + cmds[1]
+            res += "您已註冊過此股票代號:" + cmds[1]
         else:
-            res = "已為您註冊股票:" + cmds[1]
+            res += "已為您註冊股票:" + cmds[1]
     elif cmds[0] == 'd':
         # delete
-        if Stock.objects.filter(stock_id=int(cmds[1])).exists():
-            Stock.objects.filter(stock_id=int(cmds[1])).delete()
-            res = "已刪除此股票紀錄:" + cmds[1]
+        if Stock.objects.filter(user_id=user_id, stock_id=int(cmds[1])).exists():
+            Stock.objects.filter(user_id=user_id, stock_id=int(cmds[1])).delete()
+            res += "已刪除此股票紀錄:" + cmds[1]
         else:
-            res = "您尚未註冊此股票代號:" + cmds[1]
+            res += "您尚未註冊此股票代號:" + cmds[1]
     elif cmds[0] == 'q':
         # query
         res += "你所註冊過的股票代號: \n"
-        for s in Stock.objects.all():
+        for s in Stock.objects.filter(user_id=user_id):
             res += str(s.stock_id) + "\n"
     elif cmds[0] == 'h':
         # help
-        res = """
+        res += """
 請輸入以下指令:
 r <股票代號>: 註冊股票, 會收到每日收盤價推播
 d <股票代號>: 刪除此股票的每日收盤價推播
@@ -137,7 +140,7 @@ h: 指令說明
     else:
         title, price, link = getStockInfo(cmds[0])
         if title:
-            res = title[index_num_in_title] + title[index_name_in_title] + " " + price
+            res += title[index_num_in_title] + title[index_name_in_title] + " " + price
     return res, link
 
 
@@ -158,7 +161,18 @@ def callback(request):
 
         for event in events:
             if isinstance(event, MessageEvent):
-                res, link = handleMessage(event.message.text)
+                line_user_id = event.source.user_id
+                log.info(f"Message from user: {line_user_id}")  # Log or process the user ID
+                try:
+                    # Get user profile from LINE
+                    profile = line_bot_api.get_profile(line_user_id)
+                    line_display_name = profile.display_name
+                except LineBotApiError as e:
+                    log.error(f"Failed to get user profile: {e}")
+                    line_display_name = "Unknown User"
+
+                log.info(f"Message from user: {line_display_name}")  # Log or process the user name
+                res, link = handleMessage(line_user_id, line_display_name, event.message.text)
                 if link:
                     line_bot_api.reply_message(
                         event.reply_token, [
@@ -173,7 +187,7 @@ def callback(request):
         return HttpResponse()
     else:
         print("Not POST request, debug only...")
-        res, link = handleMessage('d 9876')
+        res, link = handleMessage('1', 'DEFAULT_USER', 'd 9876')
         print(res)
         return HttpResponse(res)
 
